@@ -1,7 +1,5 @@
 from django.db import models
 
-from django.db import models
-
 class Category(models.Model):
     """Modelo para armazenar as categorias de perguntas."""
     name = models.CharField(max_length=100)  # Nome da categoria

@@ -1,87 +1,114 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
-import HelloWorld from './components/HelloWorld.vue';
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div id="app">
+    <!-- Cabeçalho -->
+    <header class="app-header">
+      <h1>Catarina Quest</h1>
+      <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    </header>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <!-- Área principal -->
+    <main class="app-main">
+      <Quiz />
+    </main>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/quiz/math">Math Quiz</RouterLink> <!-- Exemplo de link com categoria específica -->
-        <RouterLink to="/quiz/science">Science Quiz</RouterLink> <!-- Outro exemplo -->
-      </nav>
-    </div>
-  </header>
-
-  <RouterView /> <!-- Exibe os componentes vinculados às rotas -->
+    <!-- Rodapé -->
+    <footer class="app-footer">
+      <p>Desenvolvido por Ana Laura, Henrique, Fábio e Sara</p>
+    </footer>
+  </div>
 </template>
 
+<script>
+import Quiz from "@/components/Quiz.vue";
+
+export default {
+  name: "App",
+  components: {
+    Quiz,
+  },
+};
+</script>
+
 <style scoped>
-/* O estilo permanece o mesmo */
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
+/* Atualizando o estilo da página para ocupar toda a altura e largura */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   width: 100%;
-  font-size: 12px;
+  background: linear-gradient(135deg, #ff0000, #b22222); /* Adicionar o fundo vermelho */
+  color: #333333;
+  position: relative;
+}
+
+.app-main {
+  flex: 1; /* Faz a área principal expandir para ocupar o espaço disponível */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffffff, #e6e6e6);
+  padding: 20px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.app-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('@/assets/bandeira-sc.svg') no-repeat center center;
+  background-size: cover;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+.app-header {
+  background: linear-gradient(90deg, #6bae4f, #d52b1e);
+  color: white;
+  padding: 20px;
   text-align: center;
-  margin-top: 2rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 20px 20px;
+  z-index: 2;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.app-footer {
+  background-color: #f7f7f7;
+  color: #555;
+  text-align: center;
+  padding: 15px;
+  z-index: 2;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.subtitle {
+  font-family: 'Lobster', cursive;
+  font-size: 2rem;
+  color: #4a4a4a; /* Ajustando a cor para combinar com o novo estilo */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+/* Responsividade */
+@media (max-width: 768px) {
+  .app-main {
+    padding: 10px;
+  }
 }
 
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+@media (max-width: 480px) {
+  .app-header {
+    font-size: 1.8rem;
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
+  .app-footer {
+    font-size: 0.8rem;
   }
 }
 </style>

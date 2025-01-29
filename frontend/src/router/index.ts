@@ -1,13 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Quiz from '../views/Quiz.vue';
+import Quiz from '../components/Quiz.vue';
 
 const routes = [
-  { path: '/quiz/:category', name: 'Quiz', component: Quiz },
+  {
+    path: '/quiz/:categoryId',
+    name: 'Quiz',
+    component: Quiz,
+    props: true  // Permite passar o ID da categoria para o componente
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 });
 
 export default router;
