@@ -64,7 +64,7 @@ export default {
   background: url('@/assets/bandeira-sc.svg') no-repeat center center;
   background-size: cover;
   opacity: 0.2;
-  z-index: 0;
+  z-index: -1; /* Coloca a imagem de fundo atrás do conteúdo */
 }
 
 .app-header {
