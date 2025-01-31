@@ -1,36 +1,40 @@
 <template>
   <div class="quiz">
-    <!-- Subtítulo "Escolha uma categoria" -->
-    <h2 class="subtitle">Escolha uma categoria:</h2>
+    <!-- Subtítulo "Escolha uma categoria" ou o nome da categoria -->
+    <h2 class="subtitle" :class="{'category-selected': selectedCategory}">
+      {{ selectedCategory ? selectedCategoryName : 'Escolha uma categoria' }}
+    </h2>
 
     <!-- Exibindo as categorias -->
     <div v-if="!selectedCategory" class="category-list">
       <div v-for="category in categories" :key="category.id" class="category-button">
-        <button @click="selectCategory(category.id)">
+        <button @click="selectCategory(category)">
           {{ category.name }}
         </button>
       </div>
     </div>
     
-    <div v-else-if="questions.length" class="question-box">
+    <!-- Exibindo perguntas e respostas -->
+    <div v-else-if="questions.length > 0" class="question-box">
       <p class="question-text">{{ currentQuestion.text }}</p>
       <div class="options">
         <button v-for="(option, index) in shuffledOptions" 
                 :key="index" 
-                @click="selectOption(option)">
-          {{ option }}
+                @click="selectOption(option)"
+                :class="{'correct': option.isCorrect && selectedAnswer !== null, 'incorrect': !option.isCorrect && selectedAnswer === option}">
+          {{ option.text }}
         </button>
       </div>
+      <p v-if="selectedAnswer !== null" class="feedback">
+        {{ selectedAnswer.isCorrect ? 'Resposta correta!' : 'Resposta incorreta.' }}
+      </p>
+      <button v-if="selectedAnswer !== null" @click="nextQuestion" class="next-button">Próxima</button>
     </div>
     
-    <div v-else-if="selectedCategory">
-      <p>Carregando perguntas...</p>
-    </div>
-
-    <!-- Botão para reiniciar -->
-    <div v-if="quizCompleted">
+    <!-- Mensagem ao finalizar o quiz -->
+    <div v-if="quizCompleted" class="result-box">
       <p>Quiz concluído! Sua pontuação: {{ score }} / {{ questions.length }}</p>
-      <button @click="resetQuiz">Voltar para categorias</button>
+      <button @click="resetQuiz" class="back-button">Voltar para categorias</button>
     </div>
   </div>
 </template>
@@ -45,8 +49,10 @@ export default {
       currentQuestionIndex: 0,
       score: 0,
       selectedCategory: null,
+      selectedCategoryName: '',  // Para armazenar o nome da categoria selecionada
       shuffledOptions: [], // Para armazenar as respostas embaralhadas
       quizCompleted: false,
+      selectedAnswer: null, // Para armazenar a resposta escolhida
     };
   },
   computed: {
@@ -64,15 +70,17 @@ export default {
         console.error("Erro ao carregar categorias:", error);
       }
     },
-    async selectCategory(categoryId) {
-      this.selectedCategory = categoryId;
+    async selectCategory(category) {
+      this.selectedCategory = category.id;
+      this.selectedCategoryName = category.name;  // Atualiza o nome da categoria
       try {
-        const response = await fetch(`http://localhost:8000/api/questions/?category=${categoryId}`);
+        const response = await fetch(`http://localhost:8000/api/questions/?category=${category.id}`);
         const data = await response.json();
         this.questions = data;
         this.currentQuestionIndex = 0;
         this.score = 0;
         this.quizCompleted = false;
+        this.selectedAnswer = null;
         this.shuffleOptions();
       } catch (error) {
         console.error("Erro ao carregar perguntas:", error);
@@ -82,36 +90,37 @@ export default {
       if (!this.currentQuestion) return;
 
       const options = [
-        this.currentQuestion.correct_answer,
-        this.currentQuestion.wrong_answer_1,
-        this.currentQuestion.wrong_answer_2,
-        this.currentQuestion.wrong_answer_3
+        { text: this.currentQuestion.correct_answer, isCorrect: true },
+        { text: this.currentQuestion.wrong_answer_1, isCorrect: false },
+        { text: this.currentQuestion.wrong_answer_2, isCorrect: false },
+        { text: this.currentQuestion.wrong_answer_3, isCorrect: false }
       ];
-
+      
       this.shuffledOptions = options.sort(() => Math.random() - 0.5);
     },
-    selectOption(selectedOption) {
-      if (selectedOption === this.currentQuestion.correct_answer) {
-        this.score++;
-        alert("Resposta correta!");
-      } else {
-        alert("Resposta incorreta.");
+    selectOption(option) {
+      if (this.selectedAnswer === null) {
+        this.selectedAnswer = option;
+        if (option.isCorrect) this.score++;
       }
-
+    },
+    nextQuestion() {
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.currentQuestionIndex++;
+        this.selectedAnswer = null;
         this.shuffleOptions();
       } else {
-        alert(`Quiz concluído! Sua pontuação foi: ${this.score}`);
         this.quizCompleted = true;
       }
     },
     resetQuiz() {
       this.selectedCategory = null;
+      this.selectedCategoryName = '';
       this.questions = [];
       this.currentQuestionIndex = 0;
       this.score = 0;
       this.quizCompleted = false;
+      this.selectedAnswer = null;
     },
   },
   mounted() {
@@ -121,79 +130,74 @@ export default {
 </script>
 
 <style scoped>
-/* Estilo para o componente quiz */
 .quiz {
   font-family: Arial, sans-serif;
   text-align: center;
-  margin: 0;
-  padding: 20px;
-  background-color: transparent; /* Remover a cor de fundo */
+  background: url('/img/bandeira.png') no-repeat center center fixed;
+  background-size: cover;
   color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 100%;
-  min-height: 100vh; /* Ajuste a altura */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  background-color: #A1D99B; /* Fundo verde claro, similar ao da bandeira de SC */
 }
 
-h2.subtitle {
+.subtitle {
   font-size: 1.8rem;
-  opacity: 100; /* Aumentar a opacidade conforme necessário */
-  margin-bottom: 20px;
-  padding: 10px 15px;
-  background: linear-gradient(90deg, #6bae4f, #d52b1e);
-  -webkit-background-clip: text;
-  color: transparent;
   font-weight: bold;
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 0 0 5px red; /* Contorno vermelho nas letras */
 }
 
-/* Estilo para a lista de categorias */
-.category-list {
+.subtitle.category-selected {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 0 0 5px red; /* Contorno vermelho nas letras */
+}
+
+.category-list, .options {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 15px;
 }
 
-/* Estilo para os botões de categoria */
-.category-button button {
-  margin: 10px;
+.category-button button, .back-button, .next-button {
   padding: 12px 24px;
   border: 3px solid #d32f2f;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #006847; /* Texto verde */
+  background-color: #d32f2f;
+  color: #ffffff;
   font-size: 1rem;
-  font-weight: bold; /* Deixa o texto mais grosso (negrito) */
+  font-weight: bold;
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.category-button button:hover {
-  background-color: #d32f2f;
-  color: #ffffff;
+.category-button button:hover, .back-button:hover, .next-button:hover {
+  background-color: #ffffff;
+  color: #d32f2f;
 }
 
-/* Estilo para o box de perguntas */
-.question-box {
-  margin-top: 30px;
-  padding: 20px;
+.question-box, .result-box {
   background-color: rgba(255, 255, 255, 0.2);
+  padding: 20px;
   border-radius: 10px;
 }
 
-/* Estilo para o texto das perguntas */
 .question-text {
   font-size: 1.4rem;
   margin-bottom: 20px;
 }
 
-/* Estilo para as opções de respostas */
 .options button {
-  display: block;
   width: 100%;
   padding: 10px;
   margin: 5px 0;
@@ -203,46 +207,21 @@ h2.subtitle {
   color: #006847;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
 }
 
-.options button:hover {
+.options button.correct {
+  background-color: #4CAF50;
+  color: #ffffff;
+}
+
+.options button.incorrect {
   background-color: #d32f2f;
   color: #ffffff;
 }
 
-/* Estilo para o container do botão "Voltar" */
-.back-button-container {
-  margin-top: 20px;
-  text-align: center;
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-}
-
-/* Estilo para o botão "Voltar" */
-.back-button {
-  margin: 10px;
-  padding: 12px 24px;
-  border: 3px solid #006847; /* Borda verde */
-  background-color: #d32f2f; /* Fundo vermelho */
-  color: #ffffff; /* Texto branco */
-  font-size: 1rem;
-  font-weight: bold; /* Deixa o texto mais grosso (negrito) */
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Fundo transparente */
-  color: #006847; /* Texto verde */
-}
-
-/* Estilo para o texto "Carregando perguntas" */
-.loading-text {
+.feedback {
   font-size: 1.2rem;
-  color: #4a4a4a; /* Tom mais escuro */
+  font-weight: bold;
+  margin-top: 10px;
 }
-
 </style>
