@@ -1,9 +1,8 @@
 <template>
-  <div id="app">
-    <!-- Cabeçalho -->
-    <header class="app-header">
-      <h1>Catarina Quest</h1>
-      <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+  <div>
+    <!-- Cabeçalho que volta para a escolha de categorias -->
+    <header class="site-header" @click="resetCategory">
+      <img src="@/assets/header-sc.png" alt="Cabeçalho" class="header-image" />
     </header>
 
     <!-- Área principal -->
@@ -19,39 +18,65 @@
 </template>
 
 <script>
-import Quiz from "@/components/Quiz.vue";
+import Quiz from './components/Quiz.vue';
 
 export default {
-  name: "App",
   components: {
-    Quiz,
+    Quiz
   },
+  methods: {
+    resetCategory() {
+      this.$emit("resetCategory"); // Dispara um evento global
+    }
+  }
 };
 </script>
 
 <style scoped>
 /* Atualizando o estilo da página para ocupar toda a altura e largura */
 #app {
+  flex-grow: 1; /* Faz a área principal expandir para ocupar o espaço disponível */
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  background: linear-gradient(135deg, #ff0000, #b22222); /* Adicionar o fundo vermelho */
-  color: #333333;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0rem;
+  overflow: hidden;
+  background: linear-gradient(150deg, #d52b1e, #d52b1e); /* Adicionar o fundo vermelho */
+  color: #d52b1e;
   position: relative;
+  --vueuse-safe-area-top: 0px;
+  --vueuse-safe-area-right: 0px;
+  --vueuse-safe-area-bottom: 0px;
+  --vueuse-safe-area-left: 0px;
+}
+
+:root {
+  --vueuse-safe-area-top: 0px;
+  --vueuse-safe-area-right: 0px;
+  --vueuse-safe-area-bottom: 0px;
+  --vueuse-safe-area-left: 0px;
 }
 
 .app-main {
-  flex: 1; /* Faz a área principal expandir para ocupar o espaço disponível */
+  flex-grow: 1; /* Faz a área principal expandir para ocupar o espaço disponível */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #ffffff, #e6e6e6);
-  padding: 20px;
+  background: linear-gradient(135deg, #9BCF4B, #9BCF4B);
+  padding: 5px;
   box-sizing: border-box;
   position: relative;
   z-index: 1;
+}
+
+.component-name {
+  --vueuse-safe-area-top: 0px;
+  --vueuse-safe-area-right: 0px;
+  --vueuse-safe-area-bottom: 0px;
+  --vueuse-safe-area-left: 0px;
 }
 
 .app-main::before {
@@ -95,20 +120,20 @@ export default {
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-  .app-main {
-    padding: 10px;
-  }
+.site-header {
+  width: 100%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  cursor: pointer; /* Deixa claro que o cabeçalho é clicável */
 }
 
-@media (max-width: 480px) {
-  .app-header {
-    font-size: 1.8rem;
-  }
-
-  .app-footer {
-    font-size: 0.8rem;
-  }
+.header-image {
+  width: 100%;
+  max-height: 1500px; /* Ajuste conforme necessário */
+  object-fit: contain; /* Mantém a proporção da imagem */
 }
+
 </style>

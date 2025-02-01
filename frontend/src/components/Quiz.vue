@@ -1,9 +1,9 @@
 <template>
   <div class="quiz">
     <!-- Subtítulo "Escolha uma categoria" ou o nome da categoria -->
-    <h2 class="subtitle" :class="{'category-selected': selectedCategory}">
-      {{ selectedCategory ? selectedCategoryName : 'Escolha uma categoria' }}
-    </h2>
+    <h1 class="subtitle" :class="{'category-selected': selectedCategory}">
+      {{ selectedCategory ? selectedCategoryName : 'Escolha uma categoria:' }}
+    </h1>
 
     <!-- Exibindo as categorias -->
     <div v-if="!selectedCategory" class="category-list">
@@ -26,7 +26,7 @@
         </button>
       </div>
       <p v-if="selectedAnswer !== null" class="feedback">
-        {{ selectedAnswer.isCorrect ? 'Resposta correta!' : 'Resposta incorreta.' }}
+        {{ selectedAnswer.isCorrect ? 'Resposta correta!' : 'Resposta incorreta' }}
       </p>
       <button v-if="selectedAnswer !== null" @click="nextQuestion" class="next-button">Próxima</button>
     </div>
@@ -60,6 +60,9 @@ export default {
       return this.questions[this.currentQuestionIndex] || {};
     },
   },
+  props: {
+    onReset: Function
+  },
   methods: {
     async fetchCategories() {
       try {
@@ -67,7 +70,7 @@ export default {
         const data = await response.json();
         this.categories = data;
       } catch (error) {
-        console.error("Erro ao carregar categorias:", error);
+        console.error("Erro ao carregar categorias", error);
       }
     },
     async selectCategory(category) {
@@ -77,18 +80,20 @@ export default {
         const response = await fetch(`http://localhost:8000/api/questions/?category=${category.id}`);
         const data = await response.json();
         this.questions = data;
+        console.log("Perguntas carregadas:", this.questions); // <-- VERIFICAR SE AS PERGUNTAS ESTÃO SENDO RECEBIDAS
         this.currentQuestionIndex = 0;
         this.score = 0;
         this.quizCompleted = false;
         this.selectedAnswer = null;
         this.shuffleOptions();
       } catch (error) {
-        console.error("Erro ao carregar perguntas:", error);
+        console.error("Erro ao carregar perguntas", error);
       }
     },
     shuffleOptions() {
       if (!this.currentQuestion) return;
 
+      // Garanta que as perguntas tenham as propriedades necessárias
       const options = [
         { text: this.currentQuestion.correct_answer, isCorrect: true },
         { text: this.currentQuestion.wrong_answer_1, isCorrect: false },
@@ -121,19 +126,24 @@ export default {
       this.score = 0;
       this.quizCompleted = false;
       this.selectedAnswer = null;
+      
+      if (this.onReset) {
+        this.onReset(); // Chama o método do App.vue
+      }
     },
   },
   mounted() {
     this.fetchCategories();
   },
 };
+
 </script>
 
 <style scoped>
 .quiz {
   font-family: Arial, sans-serif;
   text-align: center;
-  background: url('/img/bandeira.png') no-repeat center center fixed;
+  background: url('@/assets/bandeira-sc.svg') no-repeat center center;
   background-size: cover;
   color: #ffffff;
   width: 100%;
@@ -142,22 +152,22 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #A1D99B; /* Fundo verde claro, similar ao da bandeira de SC */
+  padding: 25px;
+  background-color: #9BCF4B;  /*Fundo verde claro, similar ao da bandeira de SC */
 }
 
 .subtitle {
-  font-size: 1.8rem;
+  font-size: 2.8rem;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   color: white;
   text-shadow: 0 0 5px red; /* Contorno vermelho nas letras */
 }
 
 .subtitle.category-selected {
-  font-size: 1.8rem;
+  font-size: 3rem;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   color: white;
   text-shadow: 0 0 5px red; /* Contorno vermelho nas letras */
 }
@@ -188,7 +198,7 @@ export default {
 
 .question-box, .result-box {
   background-color: rgba(255, 255, 255, 0.2);
-  padding: 20px;
+  padding: 30px;
   border-radius: 10px;
 }
 
@@ -222,6 +232,6 @@ export default {
 .feedback {
   font-size: 1.2rem;
   font-weight: bold;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 </style>
