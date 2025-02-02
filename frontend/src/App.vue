@@ -1,9 +1,10 @@
 <template>
   <div>
     <!-- Cabeçalho que volta para a escolha de categorias -->
-    <header class="site-header" @click="resetCategory">
+    <header class="site-header" @click.prevent="resetQuiz">
       <img src="@/assets/header-sc.png" alt="Cabeçalho" class="header-image" />
     </header>
+
 
     <!-- Área principal -->
     <main class="app-main">

@@ -15,8 +15,10 @@
     </div>
     
     <!-- Exibindo perguntas e respostas -->
-    <div v-else-if="questions.length > 0" class="question-box">
-      <p class="question-text">{{ currentQuestion.text }}</p>
+    <div v-else-if="questions.length > 0 && currentQuestion.question" class="question-box">
+      <!-- Exibindo a pergunta -->
+      <p class="question-text">{{ currentQuestion.question }}</p>
+      <!-- Exibindo as opções embaralhadas -->
       <div class="options">
         <button v-for="(option, index) in shuffledOptions" 
                 :key="index" 
@@ -25,16 +27,28 @@
           {{ option.text }}
         </button>
       </div>
+      <!-- Feedback para a resposta selecionada -->
       <p v-if="selectedAnswer !== null" class="feedback">
         {{ selectedAnswer.isCorrect ? 'Resposta correta!' : 'Resposta incorreta' }}
       </p>
-      <button v-if="selectedAnswer !== null" @click="nextQuestion" class="next-button">Próxima</button>
+      <!-- Botão para ir para a próxima pergunta -->
+      <button v-if="selectedAnswer !== null && currentQuestionIndex < questions.length - 1" 
+        @click="nextQuestion" 
+        class="next-button">
+        Próxima
+      </button>
+
+    </div>
+    
+    <!-- Caso não haja perguntas disponíveis -->
+    <div v-else>
+      <p>Aguarde o carregamento das perguntas, caso demore, tente selecionar outra categoria.</p>
     </div>
     
     <!-- Mensagem ao finalizar o quiz -->
     <div v-if="quizCompleted" class="result-box">
       <p>Quiz concluído! Sua pontuação: {{ score }} / {{ questions.length }}</p>
-      <button @click="resetQuiz" class="back-button">Voltar para categorias</button>
+      <button @click="resetQuiz" class="back-button">Voltar para o menu</button>
     </div>
   </div>
 </template>
@@ -49,10 +63,10 @@ export default {
       currentQuestionIndex: 0,
       score: 0,
       selectedCategory: null,
-      selectedCategoryName: '',  // Para armazenar o nome da categoria selecionada
-      shuffledOptions: [], // Para armazenar as respostas embaralhadas
+      selectedCategoryName: '',  // Nome da categoria selecionada
+      shuffledOptions: [],       // Respostas embaralhadas para a pergunta atual
       quizCompleted: false,
-      selectedAnswer: null, // Para armazenar a resposta escolhida
+      selectedAnswer: null,      // Resposta escolhida pelo usuário
     };
   },
   computed: {
@@ -68,6 +82,7 @@ export default {
       try {
         const response = await fetch("http://localhost:8000/api/categories/");
         const data = await response.json();
+        console.log("Categorias carregadas:", data);
         this.categories = data;
       } catch (error) {
         console.error("Erro ao carregar categorias", error);
@@ -75,38 +90,43 @@ export default {
     },
     async selectCategory(category) {
       this.selectedCategory = category.id;
-      this.selectedCategoryName = category.name;  // Atualiza o nome da categoria
+      this.selectedCategoryName = category.name;
+      console.log("Categoria selecionada:", this.selectedCategory);
       try {
-        const response = await fetch(`http://localhost:8000/api/questions/?category=${category.id}`);
+        const response = await fetch(`http://localhost:8000/api/questions/?category=${this.selectedCategory}`);
         const data = await response.json();
-        this.questions = data;
-        console.log("Perguntas carregadas:", this.questions); // <-- VERIFICAR SE AS PERGUNTAS ESTÃO SENDO RECEBIDAS
-        this.currentQuestionIndex = 0;
-        this.score = 0;
-        this.quizCompleted = false;
-        this.selectedAnswer = null;
-        this.shuffleOptions();
+        console.log("Perguntas carregadas:", data);
+        this.questions = Array.isArray(data) ? [...data] : [];
+        if (this.questions.length > 0) {
+          this.currentQuestionIndex = 0;
+          this.score = 0;
+          this.quizCompleted = false;
+          this.selectedAnswer = null;
+          this.shuffleOptions();
+        } else {
+          console.log("Não há perguntas para esta categoria.");
+        }
       } catch (error) {
         console.error("Erro ao carregar perguntas", error);
       }
     },
     shuffleOptions() {
-      if (!this.currentQuestion) return;
-
-      // Garanta que as perguntas tenham as propriedades necessárias
-      const options = [
-        { text: this.currentQuestion.correct_answer, isCorrect: true },
-        { text: this.currentQuestion.wrong_answer_1, isCorrect: false },
-        { text: this.currentQuestion.wrong_answer_2, isCorrect: false },
-        { text: this.currentQuestion.wrong_answer_3, isCorrect: false }
-      ];
-      
+      if (!this.currentQuestion || !this.currentQuestion.options) return;
+      // Cria um array de objetos a partir do array de opções
+      const options = this.currentQuestion.options.map((opt, index) => ({
+        text: opt,
+        isCorrect: index === this.currentQuestion.correct_option
+      }));
+      // Embaralha as opções
       this.shuffledOptions = options.sort(() => Math.random() - 0.5);
     },
     selectOption(option) {
       if (this.selectedAnswer === null) {
         this.selectedAnswer = option;
-        if (option.isCorrect) this.score++;
+          if (option.isCorrect) this.score++; // Se for a última pergunta, finalize o quiz imediatamente
+          if (this.currentQuestionIndex === this.questions.length - 1) {
+            this.quizCompleted = true;
+          }
       }
     },
     nextQuestion() {
@@ -119,6 +139,7 @@ export default {
       }
     },
     resetQuiz() {
+      console.log("Header clicado: resetCategory acionado");
       this.selectedCategory = null;
       this.selectedCategoryName = '';
       this.questions = [];
@@ -126,17 +147,16 @@ export default {
       this.score = 0;
       this.quizCompleted = false;
       this.selectedAnswer = null;
-      
       if (this.onReset) {
-        this.onReset(); // Chama o método do App.vue
+        this.onReset(); // Chama o método definido no App.vue, se houver
       }
     },
   },
   mounted() {
+    console.log("Chamando fetchCategories");
     this.fetchCategories();
   },
 };
-
 </script>
 
 <style scoped>
@@ -153,7 +173,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 25px;
-  background-color: #9BCF4B;  /*Fundo verde claro, similar ao da bandeira de SC */
+  background-color: #9BCF4B;  /* Fundo verde claro, similar ao da bandeira de SC */
 }
 
 .subtitle {
@@ -179,16 +199,32 @@ export default {
   gap: 15px;
 }
 
-.category-button button, .back-button, .next-button {
-  padding: 12px 24px;
+.category-button button, .back-button {
+  padding: 13px 26px;
   border: 3px solid #d32f2f;
   background-color: #d32f2f;
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: bold;
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.next-button {
+  padding: 12px 24px;
+  border: 3px solid #d32f2f;
+  background-color: #d32f2f;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.correct-answer, .incorrect-answer {
+  margin-bottom: 10px; /* Aumente ou diminua conforme necessário */
 }
 
 .category-button button:hover, .back-button:hover, .next-button:hover {
@@ -233,5 +269,17 @@ export default {
   font-size: 1.2rem;
   font-weight: bold;
   margin-top: 20px;
+}
+
+.result-box {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 30px;
+  border-radius: 10px;
+  margin-top: 30px; /* Afasta a caixa de resultado da caixa de pergunta */
+}
+
+.result-box p {
+  font-size: 1.6rem; /* Aumenta o tamanho da fonte do texto de pontuação */
+  margin-bottom: 20px; /* Espaço entre o texto e o botão */
 }
 </style>
