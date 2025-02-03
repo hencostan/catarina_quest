@@ -26,7 +26,6 @@ export default (await import('vue')).defineComponent({
             }
         },
         selectCategory(categoryId) {
-            // Logica para selecionar uma categoria, e carregar perguntas para essa categoria
             console.log('Categoria selecionada:', categoryId);
         },
         async fetchQuestions() {
@@ -65,14 +64,12 @@ export default (await import('vue')).defineComponent({
         this.fetchQuestions();
     },
 });
-; /* PartiallyEnd: #3632/script.vue */
+;
 function __VLS_template() {
     const __VLS_ctx = {};
     let __VLS_components;
     let __VLS_directives;
     ['category-button',];
-    // CSS variable injection 
-    // CSS variable injection end 
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
         ...{ class: ("quiz") },
     });

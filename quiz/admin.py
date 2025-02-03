@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Category, Question  # Certifique-se de importar também o Question
+from .models import Category, Question 
 
-# Registre os modelos no admin
 admin.site.register(Category)
-admin.site.register(Question)  # Adicionando o modelo Question ao admin
+admin.site.register(Question) 

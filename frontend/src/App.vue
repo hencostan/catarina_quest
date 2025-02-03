@@ -1,17 +1,13 @@
 <template>
   <div>
-    <!-- Cabeçalho que volta para a escolha de categorias -->
     <header class="site-header" @click.prevent="resetQuiz">
       <img src="@/assets/header-sc.png" alt="Cabeçalho" class="header-image" />
     </header>
 
-
-    <!-- Área principal -->
     <main class="app-main">
       <Quiz />
     </main>
 
-    <!-- Rodapé -->
     <footer class="app-footer">
       <p>Desenvolvido por Ana Laura, Henrique, Fábio e Sara</p>
     </footer>
@@ -27,24 +23,24 @@ export default {
   },
   methods: {
     resetCategory() {
-      this.$emit("resetCategory"); // Dispara um evento global
+      this.$emit("resetCategory");
     }
   }
 };
 </script>
 
 <style scoped>
-/* Atualizando o estilo da página para ocupar toda a altura e largura */
+
 #app {
-  flex-grow: 1; /* Faz a área principal expandir para ocupar o espaço disponível */
+  flex-grow: 1; 
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
   margin: 0;
-  padding: 0rem;
+  padding: 30rem;
   overflow: hidden;
-  background: linear-gradient(150deg, #d52b1e, #d52b1e); /* Adicionar o fundo vermelho */
+  background: linear-gradient(150deg, #d52b1e, #d52b1e);
   color: #d52b1e;
   position: relative;
   --vueuse-safe-area-top: 0px;
@@ -61,13 +57,13 @@ export default {
 }
 
 .app-main {
-  flex-grow: 1; /* Faz a área principal expandir para ocupar o espaço disponível */
+  flex-grow: 5; 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #9BCF4B, #9BCF4B);
-  padding: 5px;
+  padding:5px;
   box-sizing: border-box;
   position: relative;
   z-index: 1;
@@ -87,10 +83,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('@/assets/bandeira-sc.svg') no-repeat center center;
   background-size: cover;
   opacity: 0.2;
-  z-index: -1; /* Coloca a imagem de fundo atrás do conteúdo */
+  z-index: -1; 
 }
 
 .app-header {
@@ -117,7 +112,7 @@ export default {
 .subtitle {
   font-family: 'Lobster', cursive;
   font-size: 2rem;
-  color: #4a4a4a; /* Ajustando a cor para combinar com o novo estilo */
+  color: #4a4a4a;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
@@ -128,13 +123,13 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 0;
-  cursor: pointer; /* Deixa claro que o cabeçalho é clicável */
+  cursor: pointer;
 }
 
 .header-image {
   width: 100%;
-  max-height: 1500px; /* Ajuste conforme necessário */
-  object-fit: contain; /* Mantém a proporção da imagem */
+  max-height: 1500px;
+  object-fit: contain; 
 }
 
 </style>

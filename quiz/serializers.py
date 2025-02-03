@@ -32,7 +32,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             {"text": obj.wrong_answer_2, "is_correct": False},
             {"text": obj.wrong_answer_3, "is_correct": False},
         ]
-        random.shuffle(options)  # Embaralha a lista
+        random.shuffle(options)
         return [opt["text"] for opt in options]
 
     def get_correctOption(self, obj):
@@ -43,5 +43,5 @@ class QuestionSerializer(serializers.ModelSerializer):
             {"text": obj.wrong_answer_2, "is_correct": False},
             {"text": obj.wrong_answer_3, "is_correct": False},
         ]
-        random.shuffle(options)  # Embaralha novamente
+        random.shuffle(options) 
         return next(index for index, opt in enumerate(options) if opt["is_correct"])

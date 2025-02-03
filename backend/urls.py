@@ -12,6 +12,6 @@ def api_root(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('quiz.urls')),  # Essa linha precisa estar antes do `api_root`
-    path('', api_root),  # Agora a rota principal retorna os endpoints sem sobrescrever `api/`
+    path('api/', include('quiz.urls')), 
+    path('', api_root),  
 ]

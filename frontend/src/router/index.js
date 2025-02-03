@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Quiz from "../components/Quiz.vue"; // Subindo um nível
+import Quiz from "../components/Quiz.vue"; 
 const routes = [
     { path: "/quiz/:category", name: "Quiz", component: Quiz },
 ];

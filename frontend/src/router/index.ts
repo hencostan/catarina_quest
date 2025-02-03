@@ -6,7 +6,7 @@ const routes = [
     path: '/quiz/:categoryId',
     name: 'Quiz',
     component: Quiz,
-    props: true  // Permite passar o ID da categoria para o componente
+    props: true  
   }
 ];
 

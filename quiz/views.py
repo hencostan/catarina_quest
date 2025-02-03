@@ -28,7 +28,6 @@ class QuestionList(APIView):
         if not questions.exists():
             return Response({"message": "Nenhuma pergunta encontrada para essa categoria."}, status=404)
 
-        # Serializando perguntas e embaralhando as opções de resposta
         serialized_questions = []
         for question in questions:
             options = [
@@ -37,14 +36,14 @@ class QuestionList(APIView):
                 question.wrong_answer_2,
                 question.wrong_answer_3
             ]
-            random.shuffle(options)  # Embaralha as opções
+            random.shuffle(options) 
 
             serialized_questions.append({
                 "id": question.id,
                 "category": question.category.id,
                 "question": question.text,
                 "options": options,
-                "correct_option": options.index(question.correct_answer),  # Guarda o índice correto
+                "correct_option": options.index(question.correct_answer),
             })
 
         return Response(serialized_questions, status=200)

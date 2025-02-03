@@ -1,11 +1,9 @@
 <template>
   <div class="quiz">
-    <!-- Subtítulo "Escolha uma categoria" ou o nome da categoria -->
     <h1 class="subtitle" :class="{'category-selected': selectedCategory}">
       {{ selectedCategory ? selectedCategoryName : 'Escolha uma categoria:' }}
     </h1>
 
-    <!-- Exibindo as categorias -->
     <div v-if="!selectedCategory" class="category-list">
       <div v-for="category in categories" :key="category.id" class="category-button">
         <button @click="selectCategory(category)">
@@ -14,11 +12,8 @@
       </div>
     </div>
     
-    <!-- Exibindo perguntas e respostas -->
     <div v-else-if="questions.length > 0 && currentQuestion.question" class="question-box">
-      <!-- Exibindo a pergunta -->
       <p class="question-text">{{ currentQuestion.question }}</p>
-      <!-- Exibindo as opções embaralhadas -->
       <div class="options">
         <button v-for="(option, index) in shuffledOptions" 
                 :key="index" 
@@ -27,11 +22,9 @@
           {{ option.text }}
         </button>
       </div>
-      <!-- Feedback para a resposta selecionada -->
       <p v-if="selectedAnswer !== null" class="feedback">
         {{ selectedAnswer.isCorrect ? 'Resposta correta!' : 'Resposta incorreta' }}
       </p>
-      <!-- Botão para ir para a próxima pergunta -->
       <button v-if="selectedAnswer !== null && currentQuestionIndex < questions.length - 1" 
         @click="nextQuestion" 
         class="next-button">
@@ -40,12 +33,10 @@
 
     </div>
     
-    <!-- Caso não haja perguntas disponíveis -->
     <div v-else>
       <p>Aguarde o carregamento das perguntas, caso demore, tente selecionar outra categoria.</p>
     </div>
     
-    <!-- Mensagem ao finalizar o quiz -->
     <div v-if="quizCompleted" class="result-box">
       <p>Quiz concluído! Sua pontuação: {{ score }} / {{ questions.length }}</p>
       <button @click="resetQuiz" class="back-button">Voltar para o menu</button>
@@ -63,10 +54,10 @@ export default {
       currentQuestionIndex: 0,
       score: 0,
       selectedCategory: null,
-      selectedCategoryName: '',  // Nome da categoria selecionada
-      shuffledOptions: [],       // Respostas embaralhadas para a pergunta atual
+      selectedCategoryName: '',  
+      shuffledOptions: [],     
       quizCompleted: false,
-      selectedAnswer: null,      // Resposta escolhida pelo usuário
+      selectedAnswer: null, 
     };
   },
   computed: {
@@ -148,7 +139,7 @@ export default {
       this.quizCompleted = false;
       this.selectedAnswer = null;
       if (this.onReset) {
-        this.onReset(); // Chama o método definido no App.vue, se houver
+        this.onReset();
       }
     },
   },
@@ -163,17 +154,15 @@ export default {
 .quiz {
   font-family: Arial, sans-serif;
   text-align: center;
-  background: url('@/assets/bandeira-sc.svg') no-repeat center center;
   background-size: cover;
   color: #ffffff;
   width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 25px;
-  background-color: #9BCF4B;  /* Fundo verde claro, similar ao da bandeira de SC */
+  background-color: #9BCF4B; 
 }
 
 .subtitle {
@@ -181,7 +170,7 @@ export default {
   font-weight: bold;
   margin-bottom: 30px;
   color: white;
-  text-shadow: 0 0 5px red; /* Contorno vermelho nas letras */
+  text-shadow: 0 0 5px red;
 }
 
 .subtitle.category-selected {
@@ -189,7 +178,7 @@ export default {
   font-weight: bold;
   margin-bottom: 30px;
   color: white;
-  text-shadow: 0 0 5px red; /* Contorno vermelho nas letras */
+  text-shadow: 0 0 5px red;
 }
 
 .category-list, .options {
@@ -224,7 +213,7 @@ export default {
 }
 
 .correct-answer, .incorrect-answer {
-  margin-bottom: 10px; /* Aumente ou diminua conforme necessário */
+  margin-bottom: 10px;
 }
 
 .category-button button:hover, .back-button:hover, .next-button:hover {
@@ -275,11 +264,11 @@ export default {
   background-color: rgba(255, 255, 255, 0.2);
   padding: 30px;
   border-radius: 10px;
-  margin-top: 30px; /* Afasta a caixa de resultado da caixa de pergunta */
+  margin-top: 30px;
 }
 
 .result-box p {
-  font-size: 1.6rem; /* Aumenta o tamanho da fonte do texto de pontuação */
-  margin-bottom: 20px; /* Espaço entre o texto e o botão */
+  font-size: 1.6rem; 
+  margin-bottom: 20px;  
 }
 </style>
